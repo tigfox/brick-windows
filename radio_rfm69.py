@@ -6,6 +6,7 @@ Example for using the RFM69HCW Radio with Raspberry Pi.
  
 Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
+Thanks Brent!
 """
 # Import Python System Libraries
 import time
@@ -73,7 +74,7 @@ def storeReading(packet):
     lockFile = str(storageDir +  str(sender) + "/" + str(sender) + ".lock")
     rrdfile = str(storageDir + str(sender) + "/" + str(sender) + ".rrd")
     if os.path.exists(str(storageDir + str(sender) + "/")): # make sure the output directory exists - what do if no?
-        print("output file: " + outputFile + " exists.")
+        # print("output file: " + outputFile + " exists.")
         if os.path.exists(lockFile): # make sure the output file isn't being consumed by cron
             print("lock file exists, waiting")
             sleepTime = randint(1,500) / 1000
@@ -82,13 +83,13 @@ def storeReading(packet):
             storeReading(packet) # and then retry
         else: # data file exists, no lock file
             f = open(outputFile, "a+")
-            print("opened " + outputFile + " for writing")
+            # print("opened " + outputFile + " for writing")
             try:
                 f.write(str(data.decode()) + "\n")
             except UnicodeDecodeError as e:
                 print("Got a wonky packet: " + str(a))
             f.close()
-            print("closed " + outputFile)
+            # print("closed " + outputFile)
     else:
         print("We have no output file. Weird packet? Should be: " + outputFile)
     try:

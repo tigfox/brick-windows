@@ -1,0 +1,14 @@
+[Unit]
+Description=Radio Collector
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 -u radio_rfm69.py
+WorkingDirectory=/home/pi/brick-windows
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
