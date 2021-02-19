@@ -19,8 +19,8 @@ MCP9808 temp sensor: https://learn.adafruit.com/adafruit-mcp9808-precision-i2c-t
 Adafruit Feather M0 Radio RFM69 915MHz: https://learn.adafruit.com/adafruit-feather-m0-radio-with-rfm69-packet-radio
 - not the LoRa ones, and not the 433MHz ones.
 
-Raspberry Pi Zero W
-- this is great for 5-10 sensors and basic graphs. More sensors will mean more collectors.
+Raspberry Pi
+- a zero W is great for a few sensors and basic graphs. If you want more sensors, you'll probably need more collectors. If you don't want more sensors, but you want fancier graphs, you'll want a faster pi.
 
 Adafruit Radio Bonnet RFM69 915MHz: https://learn.adafruit.com/adafruit-radio-bonnets/overview
 - the receiver side of the connection, this will mount on the raspberry pi
