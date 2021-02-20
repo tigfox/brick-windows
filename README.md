@@ -13,15 +13,26 @@ Could increase this, but you'd need to change the way packets are addressed.
 Currently there's just one byte for sender, one for receiver.
 
 **Hardware**
-MCP9808 temp sensor: https://learn.adafruit.com/adafruit-mcp9808-precision-i2c-temperature-sensor-guide/arduino-code
-- nothing special about this, just had it laying around
+- MCP9808 temp sensor: https://learn.adafruit.com/adafruit-mcp9808-precision-i2c-temperature-sensor-guide/arduino-code
+Nothing special about this, just had it laying around
 
-Adafruit Feather M0 Radio RFM69 915MHz: https://learn.adafruit.com/adafruit-feather-m0-radio-with-rfm69-packet-radio
-- not the LoRa ones, and not the 433MHz ones.
+- Adafruit Feather M0 Radio RFM69 915MHz: https://learn.adafruit.com/adafruit-feather-m0-radio-with-rfm69-packet-radio
+Not the LoRa ones, and not the 433MHz ones.
 
-Raspberry Pi
-- a zero W is great for a few sensors and basic graphs. If you want more sensors, you'll probably need more collectors. If you don't want more sensors, but you want fancier graphs, you'll want a faster pi.
+- Raspberry Pi
+A zero W is great for a few sensors and basic graphs. If you want more sensors, you'll probably need more collectors. If you don't want more sensors, but you want fancier graphs, you'll want a faster pi.
 
-Adafruit Radio Bonnet RFM69 915MHz: https://learn.adafruit.com/adafruit-radio-bonnets/overview
-- the receiver side of the connection, this will mount on the raspberry pi
+- Adafruit Radio Bonnet RFM69 915MHz: https://learn.adafruit.com/adafruit-radio-bonnets/overview
+The receiver side of the connection, this will mount on the raspberry pi
+
+
+TODO:
+config radio and sensors in config file
+auto setup external drive for file structure
+python functions for sensor types in config file
+influx setup for large collector
+grafana setup for large collector
+install scripts
+config mgmt if using more than one collector
+
 
