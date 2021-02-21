@@ -51,7 +51,7 @@ import config
 #         print("rrd db couldn't update: " + str(e))
 #     return True
 
-
+storage = Storage()
 collector = config.Collector(1)
 radio2 = config.Sensor(2, "temperature", "Office")
 radio3 = config.Sensor(3, "temperature", "Front Room")
@@ -74,7 +74,7 @@ while True:
         if packet[0] == collector.rfm69.node:
             try:
                 prev_packet = packet
-                storeReading(prev_packet)
+                storage.write_data(str("radio" + prev_packet[1]).process_packet(prev_packet))
                 sender = prev_packet[1]
                 packet_text = str(prev_packet[4:], "utf-8")
                 collector.display.text(str(sender) + ': ', 0, 0, 1)
