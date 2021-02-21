@@ -92,7 +92,7 @@ class Collector:
          
         # 128x32 built-in OLED Display
         self.reset_pin = DigitalInOut(board.D4)
-        self.display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, reset=reset_pin)
+        self.display = adafruit_ssd1306.SSD1306_I2C(128, 32, self.i2c, reset=self.reset_pin)
         # Clear the display.
         self.display.fill(0)
         self.display.show()
@@ -103,7 +103,7 @@ class Collector:
         self.CS = DigitalInOut(board.CE1)
         self.RESET = DigitalInOut(board.D25)
         self.spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
-        self.rfm69 = adafruit_rfm69.RFM69(spi, CS, RESET, 915.0)
+        self.rfm69 = adafruit_rfm69.RFM69(self.spi, self.CS, self.RESET, radio_freq)
         self.rfm69.node = node_number
         self.prev_packet = None
         # Optionally set an encryption key (16 byte AES key). MUST match both
