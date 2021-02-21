@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Imports
-
+ 
 # Radio hardware bits
 import busio
 from digitalio import DigitalInOut, Direction, Pull
@@ -24,7 +24,7 @@ influxCollector = True
 influx_host = 'localhost'
 influx_port = 8086
 influx_user = 'collector'
-influx_pass = '12 SPACE dicks'
+influx_pass = '12 SPACE ducks'
 influx_db = 'lrgcollector'
 
  
@@ -70,48 +70,50 @@ class Sensor:
 
 class Collector:
     def __init__(self, node_number):
+        self.node_number = node_number
+
         # Button A
-        btnA = DigitalInOut(board.D5)
-        btnA.direction = Direction.INPUT
-        btnA.pull = Pull.UP
+        self.btnA = DigitalInOut(board.D5)
+        self.btnA.direction = Direction.INPUT
+        self.btnA.pull = Pull.UP
          
         # Button B
-        btnB = DigitalInOut(board.D6)
-        btnB.direction = Direction.INPUT
-        btnB.pull = Pull.UP
+        self.btnB = DigitalInOut(board.D6)
+        self.btnB.direction = Direction.INPUT
+        self.btnB.pull = Pull.UP
          
         # Button C
-        btnC = DigitalInOut(board.D12)
-        btnC.direction = Direction.INPUT
-        btnC.pull = Pull.UP
+        self.btnC = DigitalInOut(board.D12)
+        self.btnC.direction = Direction.INPUT
+        self.btnC.pull = Pull.UP
          
         # Create the I2C interface.
-        i2c = busio.I2C(board.SCL, board.SDA)
+        self.i2c = busio.I2C(board.SCL, board.SDA)
          
         # 128x32 built-in OLED Display
-        reset_pin = DigitalInOut(board.D4)
-        display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, reset=reset_pin)
+        self.reset_pin = DigitalInOut(board.D4)
+        self.display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, reset=reset_pin)
         # Clear the display.
-        display.fill(0)
-        display.show()
-        width = display.width
-        height = display.height
+        self.display.fill(0)
+        self.display.show()
+        self.width = self.display.width
+        self.height = self.display.height
          
         # Configure Packet Radio
-        CS = DigitalInOut(board.CE1)
-        RESET = DigitalInOut(board.D25)
-        spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
-        rfm69 = adafruit_rfm69.RFM69(spi, CS, RESET, 915.0)
-        rfm69.node = node_number
-        prev_packet = None
+        self.CS = DigitalInOut(board.CE1)
+        self.RESET = DigitalInOut(board.D25)
+        self.spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
+        self.rfm69 = adafruit_rfm69.RFM69(spi, CS, RESET, 915.0)
+        self.rfm69.node = node_number
+        self.prev_packet = None
         # Optionally set an encryption key (16 byte AES key). MUST match both
         # on the transmitter and receiver (or be set to None to disable/the default).
-        rfm69.encryption_key = b'\x01\x02\x03\x04\x05\x06\x07\x08\x01\x02\x03\x04\x05\x06\x07\x08'
+        self.rfm69.encryption_key = b'\x01\x02\x03\x04\x05\x06\x07\x08\x01\x02\x03\x04\x05\x06\x07\x08'
 
 
-radio1 = Collector(1)
-radio2 = Sensor(2, "temperature", "Office")
-radio3 = Sensor(3, "temperature", "Front Room")
+# radio1 = Collector(1)
+# radio2 = Sensor(2, "temperature", "Office")
+# radio3 = Sensor(3, "temperature", "Front Room")
 #radio4 = Sensor(4, "barometric", "Office", -2)
 
 

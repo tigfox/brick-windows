@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+ 
 
 """
 Example for using the RFM69HCW Radio with Raspberry Pi.
@@ -13,8 +13,9 @@ import time
 from random import randint
 import os
 
+import config
 # Set some constants for config
-storageDir = "/mnt/datadisk/temps/"
+# storageDir = "/mnt/datadisk/temps/"
 
 # def storeReading(packet):
 #     sender = packet[1]
@@ -50,20 +51,26 @@ storageDir = "/mnt/datadisk/temps/"
 #         print("rrd db couldn't update: " + str(e))
 #     return True
 
+
+collector = Collector(1)
+radio2 = Sensor(2, "temperature", "Office")
+radio3 = Sensor(3, "temperature", "Front Room")
+#radio4 = Sensor(4, "barometric", "Office", -2)
+
 while True:
     packet = None
     # draw a box to clear the image
-    display.fill(0)
-    display.text('RasPi Radio', 35, 0, 1)
+    collector.display.fill(0)
+    collector.display.text('Collector ' + str(collector.node_number), 35, 0, 1)
  
     # check for packet rx
     packet = rfm69.receive(with_ack=True, with_header=True)
     if packet is None:
-        display.show()
-        display.text('- Waiting for PKT -', 15, 20, 1)
+        collector.display.show()
+        collector.display.text('- Waiting for PKT -', 15, 20, 1)
     else:
         # Display the packet text and rssi
-        display.fill(0)
+        collector.display.fill(0)
         if packet[0] == rfm69.node:
             try:
                 prev_packet = packet
