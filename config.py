@@ -38,8 +38,8 @@ class Storage:
 
     def write_data(self, entry):
         if influxCollector:
-            client.write_points(entry)       
-            client.close()
+            self.client.write_points(entry)       
+            self.client.close()
             # <fix> return status code here?
         if rrdCollector:
             try:
@@ -53,10 +53,12 @@ class Sensor:
         self.name = str("sensor" + str(node_num))
         self.type = sensor_type
         self.location = location
+        self.adjustment = adjustment
+
     def process_packet(self, packet):
         try:
-            reading = packet[4:]
-            adjusted = reading + adjustment
+            reading = float(packet[4:])
+            adjusted = reading + self.adjustment
         except UnicodeDecodeError as e:
             print("funky packet, can't decode: " + str(e))
             return

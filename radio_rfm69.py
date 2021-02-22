@@ -51,7 +51,7 @@ import config
 #         print("rrd db couldn't update: " + str(e))
 #     return True
 
-storage = Storage()
+storage = config.Storage()
 collector = config.Collector(1)
 radio2 = config.Sensor(2, "temperature", "Office")
 radio3 = config.Sensor(3, "temperature", "Front Room")
@@ -74,10 +74,14 @@ while True:
         if packet[0] == collector.rfm69.node:
             try:
                 prev_packet = packet
-                storage.write_data(str("radio" + prev_packet[1]).process_packet(prev_packet))
-                sender = prev_packet[1]
+                if prev_packet[1] == 2:
+                    storage.write_data(radio2.process_packet(prev_packet))
+                if prev_packet[1] == 3:
+                    storage.write_data(radio3.process_packet(prev_packet))
+                if prev_packet[1] == 4:
+                    storage.write_data(radio4.process_packet(prev_packet))
                 packet_text = str(prev_packet[4:], "utf-8")
-                collector.display.text(str(sender) + ': ', 0, 0, 1)
+                collector.display.text(str(prev_packet[1]) + ': ', 0, 0, 1)
                 collector.display.text(packet_text, 25, 0, 1)
                 time.sleep(1)
             except UnicodeDecodeError as e:
