@@ -179,4 +179,5 @@ void loop() {
   // Serial.println(" deg C.");
   send_packet(sensortype, cur_temp_c);
   delay(10000);
+
 }

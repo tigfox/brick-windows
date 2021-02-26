@@ -1,10 +1,15 @@
 
-// Modules for the temp sensor
+// Modules for the temp & gas sensors
 #include <Wire.h>
 #include "Adafruit_MCP9808.h"
+#include "Adafruit_CCS811.h"
+
 
 // Create the MCP9808 temperature sensor object
 Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
+
+// Gas sensor object
+Adafruit_CCS811 ccs;
 
 // Modules for the radio feather
 #include <SPI.h>
@@ -13,12 +18,12 @@ Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
 #include <math.h>
 
 // Frequency for radio - needs to match receiver.
-#define RF69_FREQ 915.0
+#define RF69_FREQ 920.0
 
 // Where to send packets to! This will be the floor receiver
 #define DEST_ADDRESS   1
 // change addresses for each client board, any number :)
-#define MY_ADDRESS     3
+#define MY_ADDRESS     4
 
 #if defined(ADAFRUIT_FEATHER_M0) // Feather M0 w/Radio
   #define RFM69_CS      8
@@ -66,6 +71,13 @@ void setup() {
    //  1    0.25°C      65 ms
    //  2    0.125°C     130 ms
    //  3    0.0625°C    250 ms
+
+  Serial.println("CCS811 test");
+
+  if(!ccs.begin()){
+    Serial.println("Failed to start sensor! Please check your wiring.");
+    while(1);
+  }
   
   // Then the radio setup:
   // Serial.begin(115200);
@@ -121,6 +133,22 @@ float get_temp() {
   return cur_temp_c;
 }
 
+float get_co2() {
+  if(ccs.available()){
+    if(!ccs.readData()){
+      Serial.print("CO2: ");
+      Serial.print(ccs.geteCO2());
+      Serial.print("ppm, TVOC: ");
+      Serial.println(ccs.getTVOC());
+      return ccs.geteCO2();
+    }
+    else{
+      Serial.println("ERROR!");
+      while(1);
+    }
+  }
+}
+
 // Dont put this on the stack:
 uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];
 uint8_t data[] = "  OK";
@@ -135,11 +163,9 @@ void Blink(byte PIN, byte DELAY_MS, byte loops) {
   }
 }
 
-bool send_packet(float temp) {
-  char radiopacket[20] = {temp};
-  sprintf(radiopacket, "%f", temp);
-  // dtostrf(temp, 5, 2, radiopacket);
-  // itoa(packetnum++, radiopacket+13, 10);
+bool send_packet(char sentype, float reading) {
+  char radiopacket[20];
+  sprintf(radiopacket, "%c:%f", sentype, reading);
   Serial.println(radiopacket);
   // Serial.print("Sending "); Serial.println(radiopacket);
 
@@ -173,9 +199,14 @@ void loop() {
   // put your main code here, to run repeatedly:
   Serial.println("pulling temp");
   float cur_temp_c = get_temp();
+  char sensortype = 'T';
   // Serial.print("temp is ");
   // Serial.print(cur_temp_c);
   // Serial.println(" deg C.");
-  send_packet(cur_temp_c);
-  delay(10000);
+  send_packet(sensortype, cur_temp_c);
+  delay(5000);
+  float cur_co2 = get_co2();
+  char sensortype2 = 'C';
+  send_packet(sensortype2, cur_co2);
+  delay(5000);
 }
