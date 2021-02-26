@@ -47,27 +47,40 @@ class Storage:
             except rrdtool.OperationalError as e:
                 print("rrd db doesn't exist for sensor " + str(sender))
 
+
+# class Transmitter:
+#     def __init__(self, node_num, *args):
+#         self.node_number = node_num
+#         for sensor in args:
+#             self.sensor
+
  
 class Sensor:
-    def __init__(self, node_num, sensor_type, location, adjustment=0):
+    def __init__(self, node_num, location, sensor_list, adjustment=0):
+        '''
+        node_num = radio node number
+        location = string
+        sensor_list = [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : "0"}, { "type" : "CO2", "packet_key" : "C", "adjustment" : "0"}]
+        '''
         self.name = str("sensor" + str(node_num))
-        self.type = sensor_type
+        self.sensor_list = sensor_list
         self.location = location
         self.adjustment = adjustment
 
     def process_packet(self, packet):
         try:
-            reading = float(packet[4:])
-            adjusted = reading + self.adjustment
+            sentype = next((sentype['type'] for sentype in self.sensor_list if sentype['packet_key'] == packet[4]), None)
+            reading = float(packet[5:])
+            adjusted = reading + next((sentype['adjustment'] for sentype in self.sensor_list if sentype['packet_key'] == packet[4]), None)
         except UnicodeDecodeError as e:
             print("funky packet, can't decode: " + str(e))
             return
-        data = [{ "measurement" : self.type,
+        data = [{ "measurement" : sentype,
             "tags" : { 
                 "sensor" : self.name,
                 "location" : self.location
             }, 
-            "fields" : { self.type : float(adjusted) }}]
+            "fields" : { sentype : float(adjusted) }}]
         return data
 
 class Collector:

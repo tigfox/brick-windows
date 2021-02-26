@@ -135,9 +135,9 @@ void Blink(byte PIN, byte DELAY_MS, byte loops) {
   }
 }
 
-bool send_packet(float temp) {
-  char radiopacket[20] = {temp};
-  sprintf(radiopacket, "%f", temp);
+bool send_packet(char sentype, float temp) {
+  char radiopacket[20];
+  sprintf(radiopacket, "%s:%f",sentype, temp);
   // dtostrf(temp, 5, 2, radiopacket);
   // itoa(packetnum++, radiopacket+13, 10);
   Serial.println(radiopacket);
@@ -173,9 +173,10 @@ void loop() {
   // put your main code here, to run repeatedly:
   Serial.println("pulling temp");
   float cur_temp_c = get_temp();
+  char sensortype = 'T';
   // Serial.print("temp is ");
   // Serial.print(cur_temp_c);
   // Serial.println(" deg C.");
-  send_packet(cur_temp_c);
+  send_packet(sensortype, cur_temp_c);
   delay(10000);
 }
