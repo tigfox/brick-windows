@@ -12,7 +12,7 @@ import adafruit_rfm69
 from influxdb import InfluxDBClient
 data_dir="/mnt/datadisk/"
 
-radio_freq=915.00
+radio_freq=920.00
 
 #simple rrd database, static graphs. great for small collectors, few sensors.
 rrdCollector = False
@@ -69,8 +69,11 @@ class Sensor:
 
     def process_packet(self, packet):
         try:
+            print(packet.decode())
             sentype = next((sentype['type'] for sentype in self.sensor_list if sentype['packet_key'] == packet[4]), None)
-            reading = float(packet[5:])
+            
+            print(sentype)
+            reading = float(packet[6:])
             adjusted = reading + next((sentype['adjustment'] for sentype in self.sensor_list if sentype['packet_key'] == packet[4]), None)
         except UnicodeDecodeError as e:
             print("funky packet, can't decode: " + str(e))
