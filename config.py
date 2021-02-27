@@ -66,24 +66,35 @@ class Sensor:
         self.sensor_list = sensor_list
         self.location = location
         self.adjustment = adjustment
+        for sensor in self.sensor_list:
+            print(sensor['packet_key'])
 
     def process_packet(self, packet):
         try:
-            print(packet.decode())
-            sentype = next((sentype['type'] for sentype in self.sensor_list if sentype['packet_key'] == packet[4]), None)
+            print(repr(packet))
+            print("zeroth char: " + str(packet[0]))
+            print("first char: " + str(packet[1]))
+            print("second char: " + str(packet[2]))
+            print("third char: " + str(packet[3]))
+            print("fourth char: " + str(packet[4]))
+            print("fifth char: " + str(packet[5]))
+            print("sixth char: " + str(packet[6]))
+            # print(packet.decode())
+            sentype = next((sentype['type'] for sentype in self.sensor_list if sentype['packet_key'] == packet[5]), None)
             
             print(sentype)
             reading = float(packet[6:])
-            adjusted = reading + next((sentype['adjustment'] for sentype in self.sensor_list if sentype['packet_key'] == packet[4]), None)
+            adjusted = reading + next((sentype['adjustment'] for sentype in self.sensor_list if sentype['packet_key'] == packet[5]), None)
         except UnicodeDecodeError as e:
             print("funky packet, can't decode: " + str(e))
-            return
+            return None
         data = [{ "measurement" : sentype,
             "tags" : { 
                 "sensor" : self.name,
                 "location" : self.location
             }, 
             "fields" : { sentype : float(adjusted) }}]
+        
         return data
 
 class Collector:

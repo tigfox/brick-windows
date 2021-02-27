@@ -40,11 +40,13 @@ while True:
             try:
                 prev_packet = packet
                 if prev_packet[1] == 2:
-                    storage.write_data(radio2.process_packet(prev_packet))
+                    data_reading = radio2.process_packet(prev_packet)
                 if prev_packet[1] == 3:
-                    storage.write_data(radio3.process_packet(prev_packet))
+                    data_reading = radio3.process_packet(prev_packet)
                 if prev_packet[1] == 4:
-                    storage.write_data(radio4.process_packet(prev_packet))
+                    data_reading = radio4.process_packet(prev_packet)
+                if data_reading is not None:
+                    storage.write_data(data_reading)
                 packet_text = str(prev_packet[4:], "utf-8")
                 collector.display.text(str(prev_packet[1]) + ': ', 0, 0, 1)
                 collector.display.text(packet_text, 25, 0, 1)
