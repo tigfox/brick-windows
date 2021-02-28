@@ -59,6 +59,8 @@ while True:
                 time.sleep(1)
             except UnicodeDecodeError as e:
                 print("funky packet: " + str(e)) 
+            except ValueError as e:
+                print("funky packet: " + str(e))
 
     if not collector.btnA.value:
         # Send Button A
