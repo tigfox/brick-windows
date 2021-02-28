@@ -18,9 +18,9 @@ import config
 
 storage = config.Storage()
 collector = config.Collector(1)
-radio2 = config.Sensor(2, "Office", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : "0"}, { "type" : "CO2", "packet_key" : "C", "adjustment" : "0"}])
-radio3 = config.Sensor(3, "Front Room", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : "0"}, { "type" : "CO2", "packet_key" : "C", "adjustment" : "0"}])
-radio4 = config.Sensor(4, "Front Room", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : "0"}, { "type" : "CO2", "packet_key" : "C", "adjustment" : "0"}])
+radio2 = config.Sensor(2, "Outside", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : 0}])
+radio3 = config.Sensor(3, "Front Room", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : 0}, { "type" : "CO2", "packet_key" : "C", "adjustment" : 0}])
+radio4 = config.Sensor(4, "Office", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : 0}, { "type" : "CO2", "packet_key" : "C", "adjustment" : 0}])
 
 while True:
     packet = None
@@ -36,20 +36,26 @@ while True:
     else:
         # Display the packet text and rssi
         collector.display.fill(0)
+        pkt_data = []
+        pkt_data = packet.split(b':')
         if packet[0] == collector.rfm69.node:
             try:
+                node_num = int(pkt_data[1].decode())
+                read_type = str(pkt_data[2].decode())
+                reading = float(pkt_data[3].decode())
+                # print("Sensor " + str(pkt_data[1].decode()) + " reporting a " + str(pkt_data[2].decode()) + " reading of " + str(pkt_data[3].decode()))
                 prev_packet = packet
-                if prev_packet[1] == 2:
+                if node_num == 2:
                     data_reading = radio2.process_packet(prev_packet)
-                if prev_packet[1] == 3:
+                if node_num == 3:
                     data_reading = radio3.process_packet(prev_packet)
-                if prev_packet[1] == 4:
+                if node_num == 4:
                     data_reading = radio4.process_packet(prev_packet)
                 if data_reading is not None:
                     storage.write_data(data_reading)
                 packet_text = str(prev_packet[4:], "utf-8")
-                collector.display.text(str(prev_packet[1]) + ': ', 0, 0, 1)
-                collector.display.text(packet_text, 25, 0, 1)
+                collector.display.text(str(node_num) + ': ', 0, 0, 1)
+                collector.display.text(str(reading), 25, 0, 1)
                 time.sleep(1)
             except UnicodeDecodeError as e:
                 print("funky packet: " + str(e)) 

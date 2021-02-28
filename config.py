@@ -12,7 +12,7 @@ import adafruit_rfm69
 from influxdb import InfluxDBClient
 data_dir="/mnt/datadisk/"
 
-radio_freq=920.00
+radio_freq=915.00
 
 #simple rrd database, static graphs. great for small collectors, few sensors.
 rrdCollector = False
@@ -60,31 +60,23 @@ class Sensor:
         '''
         node_num = radio node number
         location = string
-        sensor_list = [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : "0"}, { "type" : "CO2", "packet_key" : "C", "adjustment" : "0"}]
+        sensor_list = [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : 0}, { "type" : "CO2", "packet_key" : "C", "adjustment" : 0}]
         '''
         self.name = str("sensor" + str(node_num))
         self.sensor_list = sensor_list
         self.location = location
-        self.adjustment = adjustment
-        for sensor in self.sensor_list:
-            print(sensor['packet_key'])
 
     def process_packet(self, packet):
         try:
-            print(repr(packet))
-            print("zeroth char: " + str(packet[0]))
-            print("first char: " + str(packet[1]))
-            print("second char: " + str(packet[2]))
-            print("third char: " + str(packet[3]))
-            print("fourth char: " + str(packet[4]))
-            print("fifth char: " + str(packet[5]))
-            print("sixth char: " + str(packet[6]))
-            # print(packet.decode())
-            sentype = next((sentype['type'] for sentype in self.sensor_list if sentype['packet_key'] == packet[5]), None)
-            
-            print(sentype)
-            reading = float(packet[6:])
-            adjusted = reading + next((sentype['adjustment'] for sentype in self.sensor_list if sentype['packet_key'] == packet[5]), None)
+            split_pkt = []
+            split_pkt = packet.split(b':')
+            # print(dags)
+            node_num = int(split_pkt[1].decode())
+            pkt_key = str(split_pkt[2].decode())
+            reading = float(split_pkt[3].decode())
+            sentype = next((sentype['type'] for sentype in self.sensor_list if sentype['packet_key'] == pkt_key), None)
+            # print("sensor type from reading: " + sentype)
+            adjusted = reading + next((sentype['adjustment'] for sentype in self.sensor_list if sentype['packet_key'] == pkt_key), None)
         except UnicodeDecodeError as e:
             print("funky packet, can't decode: " + str(e))
             return None
