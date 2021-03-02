@@ -21,6 +21,7 @@ collector = config.Collector(1)
 radio2 = config.Sensor(2, "Outside", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : 0}])
 radio3 = config.Sensor(3, "Front Room", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : 0}, { "type" : "CO2", "packet_key" : "C", "adjustment" : 0}])
 radio4 = config.Sensor(4, "Office", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : 0}, { "type" : "CO2", "packet_key" : "C", "adjustment" : 0}])
+radio5 = config.Sensor(5, "Bedroom", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : 0}, { "type" : "CO2", "packet_key" : "C", "adjustment" : 0}])
 
 while True:
     packet = None
@@ -51,6 +52,8 @@ while True:
                     data_reading = radio3.process_packet(prev_packet)
                 if node_num == 4:
                     data_reading = radio4.process_packet(prev_packet)
+                if node_num == 5:
+                    data_reading = radio5.process_packet(prev_packet)
                 if data_reading is not None:
                     storage.write_data(data_reading)
                 packet_text = str(prev_packet[4:], "utf-8")
