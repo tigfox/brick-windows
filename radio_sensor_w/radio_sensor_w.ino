@@ -137,6 +137,6 @@ void loop() {
     Serial.println("WET");
     send_packet(sensortype, 1);
    }
-  delay(10000);
+  delay(60000);
 
 }
