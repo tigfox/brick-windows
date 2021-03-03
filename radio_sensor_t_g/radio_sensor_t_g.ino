@@ -18,12 +18,12 @@ Adafruit_CCS811 ccs;
 #include <math.h>
 
 // Frequency for radio - needs to match receiver.
-#define RF69_FREQ 920.0
+#define RF69_FREQ 915.0
 
 // Where to send packets to! This will be the floor receiver
 #define DEST_ADDRESS   1
 // change addresses for each client board, any number :)
-#define MY_ADDRESS     4
+#define MY_ADDRESS     5
 
 #if defined(ADAFRUIT_FEATHER_M0) // Feather M0 w/Radio
   #define RFM69_CS      8
@@ -65,7 +65,7 @@ void setup() {
     
    Serial.println("Found MCP9808!");
      
-   tempsensor.setResolution(1); // sets the resolution mode of reading, the modes are defined in the table bellow:
+   tempsensor.setResolution(2); // sets the resolution mode of reading, the modes are defined in the table bellow:
    // Mode Resolution SampleTime
    //  0    0.5°C       30 ms
    //  1    0.25°C      65 ms
@@ -164,8 +164,8 @@ void Blink(byte PIN, byte DELAY_MS, byte loops) {
 }
 
 bool send_packet(char sentype, float reading) {
-  char radiopacket[20];
-  sprintf(radiopacket, "%c:%f", sentype, reading);
+  char radiopacket[20] = "";
+  sprintf(radiopacket, ":%i:%c:%f", MY_ADDRESS, sentype, reading);
   Serial.println(radiopacket);
   // Serial.print("Sending "); Serial.println(radiopacket);
 

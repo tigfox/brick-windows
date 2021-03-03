@@ -18,7 +18,7 @@ Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
 // Where to send packets to! This will be the floor receiver
 #define DEST_ADDRESS   1
 // change addresses for each client board, any number :)
-#define MY_ADDRESS     3
+#define MY_ADDRESS     2
 
 #if defined(ADAFRUIT_FEATHER_M0) // Feather M0 w/Radio
   #define RFM69_CS      8
@@ -135,9 +135,9 @@ void Blink(byte PIN, byte DELAY_MS, byte loops) {
   }
 }
 
-bool send_packet(char sentype, float temp) {
-  char radiopacket[20];
-  sprintf(radiopacket, "%s:%f",sentype, temp);
+bool send_packet(char sentype, float reading) {
+  char radiopacket[20] = "";
+  sprintf(radiopacket, ":%i:%c:%f", MY_ADDRESS, sentype, reading);
   // dtostrf(temp, 5, 2, radiopacket);
   // itoa(packetnum++, radiopacket+13, 10);
   Serial.println(radiopacket);
