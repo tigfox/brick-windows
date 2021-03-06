@@ -19,7 +19,7 @@ import config
 storage = config.Storage()
 collector = config.Collector(1)
 radio2 = config.Sensor(2, "Outside", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : 0}])
-radio3 = config.Sensor(3, "Front Room", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : 0}, { "type" : "CO2", "packet_key" : "C", "adjustment" : 0}])
+radio3 = config.Sensor(3, "Front Room", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : 0}, { "type" : "CO2", "packet_key" : "C", "adjustment" : 0}, { "type" : "Humidity", "packet_key" : "H", "adjustment" : 0}, { "type" : "TVOC", "packet_key" : "V", "adjustment" : 0}])
 radio4 = config.Sensor(4, "Office", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : 0}, { "type" : "CO2", "packet_key" : "C", "adjustment" : 0}])
 radio5 = config.Sensor(5, "Bedroom", [{ "type" : "Temperature", "packet_key" : "T", "adjustment" : 0}, { "type" : "CO2", "packet_key" : "C", "adjustment" : 0}])
 radio6 = config.Sensor(6, "Basement", [{ "type" : "Water", "packet_key" : "W", "adjustment" : 0}])
@@ -66,6 +66,8 @@ while True:
             except UnicodeDecodeError as e:
                 print("funky packet: " + str(e)) 
             except ValueError as e:
+                print("funky packet: " + str(e))
+            except IndexError as e:
                 print("funky packet: " + str(e))
 
     if not collector.btnA.value:
