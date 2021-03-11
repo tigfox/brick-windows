@@ -1,12 +1,14 @@
 
 // Modules for the temp & gas sensors
 #include <Wire.h>
-#include "Adafruit_MCP9808.h"
+#include <Arduino.h>
 #include "Adafruit_CCS811.h"
+#include "Adafruit_SHT31.h"
 
-
-// Create the MCP9808 temperature sensor object
-Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
+// temp / humdity sensor
+bool enableHeater = false;
+uint8_t loopCnt = 0;
+Adafruit_SHT31 sht31 = Adafruit_SHT31();
 
 // Gas sensor object
 Adafruit_CCS811 ccs;
@@ -23,7 +25,7 @@ Adafruit_CCS811 ccs;
 // Where to send packets to! This will be the floor receiver
 #define DEST_ADDRESS   1
 // change addresses for each client board, any number :)
-#define MY_ADDRESS     5
+#define MY_ADDRESS     3
 
 #if defined(ADAFRUIT_FEATHER_M0) // Feather M0 w/Radio
   #define RFM69_CS      8
@@ -44,45 +46,19 @@ int16_t packetnum = 0;  // packet counter, we increment per xmission
 void setup() {
   // First the temp sensor setup:
   Serial.begin(9600);
-  Serial.println("MCP9808 Initializing");
-    // Make sure the sensor is found, you can also pass in a different i2c
-  // address with tempsensor.begin(0x19) for example, also can be left in blank for default address use
-  // Also there is a table with all addres possible for this sensor, you can connect multiple sensors
-  // to the same i2c bus, just configure each sensor with a different address and define multiple objects for that
-  //  A2 A1 A0 address
-  //  0  0  0   0x18  this is the default address
-  //  0  0  1   0x19
-  //  0  1  0   0x1A
-  //  0  1  1   0x1B
-  //  1  0  0   0x1C
-  //  1  0  1   0x1D
-  //  1  1  0   0x1E
-  //  1  1  1   0x1F
-  if (!tempsensor.begin(0x18)) {
-    Serial.println("Couldn't find MCP9808! Check your connections and verify the address is correct.");
-    while (1);
-  }
-    
-   Serial.println("Found MCP9808!");
-     
-   tempsensor.setResolution(2); // sets the resolution mode of reading, the modes are defined in the table bellow:
-   // Mode Resolution SampleTime
-   //  0    0.5°C       30 ms
-   //  1    0.25°C      65 ms
-   //  2    0.125°C     130 ms
-   //  3    0.0625°C    250 ms
+    Serial.println("SHT31 test");
+  if (! sht31.begin(0x44)) {   // Set to 0x45 for alternate i2c addr
+    Serial.println("Couldn't find SHT31");
+    while (1) delay(1);
 
   Serial.println("CCS811 test");
-
+  }
   if(!ccs.begin()){
     Serial.println("Failed to start sensor! Please check your wiring.");
     while(1);
   }
   
-  // Then the radio setup:
-  // Serial.begin(115200);
-  //while (!Serial) { delay(1); } // wait until serial console is open, remove if not tethered to computer
-
+  // then the radio setup
   pinMode(LED, OUTPUT);     
   pinMode(RFM69_RST, OUTPUT);
   digitalWrite(RFM69_RST, LOW);
@@ -122,15 +98,16 @@ void setup() {
 }
 
 float get_temp() {
-  Serial.println("wake up MCP9808");
-  tempsensor.wake();
-  float cur_temp_c = tempsensor.readTempC();
+  float cur_temp_c = sht31.readTemperature();
   Serial.print("Temp: ");
   Serial.print(cur_temp_c, 2);
   Serial.println("*C");
-  tempsensor.shutdown_wake(1);
-  Serial.println("Shutdown temp sensor");
   return cur_temp_c;
+}
+
+float get_hum() {
+  float cur_hum_perc = sht31.readHumidity();
+  return cur_hum_perc;
 }
 
 float get_co2() {
@@ -196,17 +173,29 @@ bool send_packet(char sentype, float reading) {
 
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  Serial.println("pulling temp");
-  float cur_temp_c = get_temp();
-  char sensortype = 'T';
-  // Serial.print("temp is ");
-  // Serial.print(cur_temp_c);
-  // Serial.println(" deg C.");
-  send_packet(sensortype, cur_temp_c);
-  delay(5000);
-  float cur_co2 = get_co2();
-  char sensortype2 = 'C';
-  send_packet(sensortype2, cur_co2);
-  delay(5000);
+  int counter;
+  while(1) {
+    float cur_hum_perc = get_hum();
+    char sensortype = 'H';
+    send_packet(sensortype, cur_hum_perc);
+    counter++;
+    delay(1000);
+    float cur_temp_c = get_temp();
+    sensortype = 'T';
+    send_packet(sensortype, cur_temp_c);
+    counter++;
+    delay(5000);
+    float cur_co2 = get_co2();
+    sensortype = 'C';
+    send_packet(sensortype, cur_co2);
+    counter++;
+    delay(5000);
+    if(counter >= 5000) {
+        digitalWrite(RFM69_RST, HIGH);
+        delay(10);
+        digitalWrite(RFM69_RST, LOW);
+        delay(10);
+        counter = 0;
+    }
+  }
 }
