@@ -190,11 +190,17 @@ void loop() {
     send_packet(sensortype, cur_co2);
     counter++;
     delay(5000);
-    if(counter >= 5000) {
+    if(counter >= 5000) { // you really should put this in a function <fix>
         digitalWrite(RFM69_RST, HIGH);
         delay(10);
         digitalWrite(RFM69_RST, LOW);
         delay(10);
+        rf69_manager.init();
+        rf69.setFrequency(RF69_FREQ);
+        rf69.setTxPower(20, true);
+        uint8_t key[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                    0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
+        rf69.setEncryptionKey(key);
         counter = 0;
     }
   }
