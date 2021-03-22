@@ -10,9 +10,6 @@ bool enableHeater = false;
 uint8_t loopCnt = 0;
 Adafruit_SHT31 sht31 = Adafruit_SHT31();
 
-// Gas sensor object
-Adafruit_CCS811 ccs;
-
 // Modules for the radio feather
 #include <SPI.h>
 #include <RH_RF69.h>
@@ -48,18 +45,11 @@ int digitaInput = 6;
 void setup() {
   // First the temp sensor setup:
   Serial.begin(9600);
-    Serial.println("SHT31 test");
+  Serial.println("SHT31 test");
   if (! sht31.begin(0x44)) {   // Set to 0x45 for alternate i2c addr
     Serial.println("Couldn't find SHT31");
     while (1) delay(1);
-
-  Serial.println("CCS811 test");
   }
-  if(!ccs.begin()){
-    Serial.println("Failed to start sensor! Please check your wiring.");
-    while(1);
-  }
-
   // then the water sensor:
   pinMode(digitaInput, INPUT);  
   
@@ -115,22 +105,6 @@ float get_hum() {
   return cur_hum_perc;
 }
 
-float get_co2() {
-  if(ccs.available()){
-    if(!ccs.readData()){
-      Serial.print("CO2: ");
-      Serial.print(ccs.geteCO2());
-      Serial.print("ppm, TVOC: ");
-      Serial.println(ccs.getTVOC());
-      return ccs.geteCO2();
-    }
-    else{
-      Serial.println("ERROR!");
-      while(1);
-    }
-  }
-}
-
 // Dont put this on the stack:
 uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];
 uint8_t data[] = "  OK";
@@ -184,12 +158,14 @@ void loop() {
     char sensortype = 'H';
     send_packet(sensortype, cur_hum_perc);
     counter++;
-    delay(1000);
+    long delaytime = 5000 + random(1000);
+    delay(delaytime);
     float cur_temp_c = get_temp();
     sensortype = 'T';
     send_packet(sensortype, cur_temp_c);
     counter++;
-    delay(5000);
+    delaytime = 5000 + random(1000);
+    delay(delaytime);
     sensortype = 'W';
     if (digitalRead(digitaInput)==LOW)
      {
@@ -202,7 +178,8 @@ void loop() {
         send_packet(sensortype, 1);
       }
     counter++;
-    delay(5000);
+    delaytime = 5000 + random(1000);
+    delay(delaytime);
     if(counter >= 5000) { // you really should put this in a function <fix>
         digitalWrite(RFM69_RST, HIGH);
         delay(10);

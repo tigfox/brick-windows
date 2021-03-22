@@ -179,17 +179,20 @@ void loop() {
     char sensortype = 'H';
     send_packet(sensortype, cur_hum_perc);
     counter++;
-    delay(1000);
+    long delaytime = 5000 + random(1000);
+    delay(delaytime);
     float cur_temp_c = get_temp();
     sensortype = 'T';
     send_packet(sensortype, cur_temp_c);
     counter++;
-    delay(5000);
+    delaytime = 5000 + random(1000);
+    delay(delaytime);
     float cur_co2 = get_co2();
     sensortype = 'C';
     send_packet(sensortype, cur_co2);
     counter++;
-    delay(5000);
+    delaytime = 5000 + random(1000);
+    delay(delaytime);
     if(counter >= 5000) { // you really should put this in a function <fix>
         digitalWrite(RFM69_RST, HIGH);
         delay(10);
