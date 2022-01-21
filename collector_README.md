@@ -12,6 +12,7 @@ Set up the external drive: https://www.raspberrypi.org/documentation/configurati
 InfluxDB Install
 - Make sure to keep the db on the external drive so you don't wear out your SD card.
 - Follow these instructions: https://pimylifeup.com/raspberry-pi-influxdb/
+- Call the database lrgcollector, user "collector"
 
 Grafana Install
 - https://pimylifeup.com/raspberry-pi-grafana/
