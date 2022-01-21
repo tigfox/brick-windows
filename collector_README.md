@@ -1,4 +1,3 @@
-
 How to build the collector
 
 Download the most recent 'lite' version of raspian from the raspberry pi foundation
