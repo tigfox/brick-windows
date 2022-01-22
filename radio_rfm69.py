@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
- 
+
 
 """
 Example for using the RFM69HCW Radio with Raspberry Pi.
- 
+
 Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
 Thanks Brent!
@@ -29,7 +29,7 @@ while True:
     # draw a box to clear the image
     collector.display.fill(0)
     collector.display.text('Collector ' + str(collector.node_number), 35, 0, 1)
- 
+
     # check for packet rx
     packet = collector.rfm69.receive(with_ack=True, with_header=True)
     if packet is None:
@@ -64,7 +64,7 @@ while True:
                 collector.display.text(str(reading), 25, 0, 1)
                 time.sleep(1)
             except UnicodeDecodeError as e:
-                print("funky packet: " + str(e)) 
+                print("funky packet: " + str(e))
             except ValueError as e:
                 print("funky packet: " + str(e))
             except IndexError as e:
@@ -88,6 +88,6 @@ while True:
         #button_c_data = bytes("Button C!\r\n","utf-8")
         #rfm69.send(button_c_data)
         collector.display.text("That's Button C!", 25, 15, 1)
- 
+
     collector.display.show()
     time.sleep(0.1)

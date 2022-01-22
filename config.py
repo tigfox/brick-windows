@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Imports
- 
+
 # Radio hardware bits
 import busio
 from digitalio import DigitalInOut, Direction, Pull
@@ -27,18 +27,36 @@ influx_user = 'collector'
 influx_pass = '12 SPACE ducks'
 influx_db = 'lrgcollector'
 
- 
+target_temp = 22
+
+class Boiler:
+    def __init__(self):
+        self.running = False
+
+    def get_status(self):
+        #send getStatus packet
+        #await returned status
+        pass
+
+    def turn_on(self):
+        self.running = True
+        #send turn on command
+
+    def turn_off(self):
+        self.running = False
+        #send turn off command
+
 class Storage:
     def __init__(self):
         if influxCollector:
             self.name = influx_db
             self.client = InfluxDBClient(influx_host, influx_port, influx_user, influx_pass, influx_db)
         if rrdCollector:
-            self.name = rrd_file    
+            self.name = rrd_file
 
     def write_data(self, entry):
         if influxCollector:
-            self.client.write_points(entry)       
+            self.client.write_points(entry)
             self.client.close()
             # <fix> return status code here?
         if rrdCollector:
@@ -48,13 +66,6 @@ class Storage:
                 print("rrd db doesn't exist for sensor " + str(sender))
 
 
-# class Transmitter:
-#     def __init__(self, node_num, *args):
-#         self.node_number = node_num
-#         for sensor in args:
-#             self.sensor
-
- 
 class Sensor:
     def __init__(self, node_num, location, sensor_list, adjustment=0):
         '''
@@ -81,12 +92,12 @@ class Sensor:
             print("funky packet, can't decode: " + str(e))
             return None
         data = [{ "measurement" : sentype,
-            "tags" : { 
+            "tags" : {
                 "sensor" : self.name,
                 "location" : self.location
-            }, 
+            },
             "fields" : { sentype : float(adjusted) }}]
-        
+
         return data
 
 class Collector:
@@ -97,20 +108,20 @@ class Collector:
         self.btnA = DigitalInOut(board.D5)
         self.btnA.direction = Direction.INPUT
         self.btnA.pull = Pull.UP
-         
+
         # Button B
         self.btnB = DigitalInOut(board.D6)
         self.btnB.direction = Direction.INPUT
         self.btnB.pull = Pull.UP
-         
+
         # Button C
         self.btnC = DigitalInOut(board.D12)
         self.btnC.direction = Direction.INPUT
         self.btnC.pull = Pull.UP
-         
+
         # Create the I2C interface.
         self.i2c = busio.I2C(board.SCL, board.SDA)
-         
+
         # 128x32 built-in OLED Display
         self.reset_pin = DigitalInOut(board.D4)
         self.display = adafruit_ssd1306.SSD1306_I2C(128, 32, self.i2c, reset=self.reset_pin)
@@ -119,7 +130,7 @@ class Collector:
         self.display.show()
         self.width = self.display.width
         self.height = self.display.height
-         
+
         # Configure Packet Radio
         self.CS = DigitalInOut(board.CE1)
         self.RESET = DigitalInOut(board.D25)
