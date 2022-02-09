@@ -178,7 +178,7 @@ void loop() {
   // Serial.print(cur_temp_c);
   // Serial.println(" deg C.");
   send_packet(sensortype, cur_temp_c);
-  long delaytime = 5000 + random(1000);
+  long delaytime = 5000 + random(5000);
   delay(delaytime);
 
 }
